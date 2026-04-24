@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --deep: #042a3a;
+    --ocean: #0a5c78;
+    --teal: #0ea5a0;
+    --foam: #7ef0e8;
+    --sand: #f5efe6;
+    --gold: #e8b84b;
+    --coral: #e05a4b;
+    --white: #fdfefe;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--deep);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated underwater background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(10,92,120,0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 80%, rgba(14,165,160,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 60% 30%, rgba(4,42,58,0.8) 0%, transparent 70%);
+    z-index: 0;
+    animation: shimmer 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes shimmer {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+
+  /* Floating bubbles */
+  .bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .bubble {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(126,240,232,0.2);
+    animation: rise linear infinite;
+  }
+  .bubble:nth-child(1) { width:8px; height:8px; left:10%; animation-duration:12s; animation-delay:0s; }
+  .bubble:nth-child(2) { width:14px; height:14px; left:25%; animation-duration:16s; animation-delay:3s; }
+  .bubble:nth-child(3) { width:6px; height:6px; left:45%; animation-duration:10s; animation-delay:6s; }
+  .bubble:nth-child(4) { width:10px; height:10px; left:65%; animation-duration:14s; animation-delay:1s; }
+  .bubble:nth-child(5) { width:18px; height:18px; left:80%; animation-duration:18s; animation-delay:4s; }
+  .bubble:nth-child(6) { width:5px; height:5px; left:90%; animation-duration:9s; animation-delay:8s; }
+
+  @keyframes rise {
+    0% { bottom: -20px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.6; }
+    100% { bottom: 105%; opacity: 0; }
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    background: rgba(4, 42, 58, 0.75);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(126,240,232,0.15);
+    border-radius: 28px;
+    padding: 40px 36px;
+    max-width: 620px;
+    width: 100%;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(126,240,232,0.12);
+    animation: cardIn 0.8s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header { text-align: center; margin-bottom: 32px; }
+
+  .turtle-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+  }
+  h1 span { color: var(--foam); }
+
+  .subtitle {
+    color: rgba(126,240,232,0.6);
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(126,240,232,0.3), transparent);
+    margin: 28px 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+  .select-wrap.full { grid-column: span 2; }
+
+  .select-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(126,240,232,0.7);
+    margin-bottom: 6px;
+    padding-left: 4px;
+  }
+
+  select {
+    width: 100%;
+    padding: 12px 40px 12px 16px;
+    background: rgba(10,92,120,0.4);
+    border: 1px solid rgba(126,240,232,0.2);
+    border-radius: 12px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    outline: none;
+  }
+  select:focus, select:hover {
+    border-color: rgba(126,240,232,0.5);
+    background: rgba(14,165,160,0.2);
+    box-shadow: 0 0 0 3px rgba(126,240,232,0.08);
+  }
+  select option { background: #042a3a; color: white; }
+
+  .select-arrow {
+    position: absolute;
+    right: 14px;
+    bottom: 13px;
+    color: rgba(126,240,232,0.5);
+    pointer-events: none;
+    font-size: 12px;
+  }
+
+  .btn-row { display: flex; gap: 12px; }
+
+  .btn {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--teal), var(--ocean));
+    color: white;
+    box-shadow: 0 4px 20px rgba(14,165,160,0.35);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(14,165,160,0.5);
+  }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* Result */
+  #result {
+    display: none;
+    margin-top: 28px;
+    animation: resultIn 0.6s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  @keyframes resultIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .img-frame {
+    position: relative;
+    width: 100%;
+    height: 230px;
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: var(--ocean);
+  }
+
+  .img-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(4,42,58,0.85) 0%, transparent 50%);
+  }
+
+  #turtle-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+  .img-frame:hover #turtle-image { transform: scale(1.04); }
+
+  .img-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px;
+    z-index: 1;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    margin-bottom: 8px;
+  }
+  .badge-oman { background: rgba(52,199,89,0.2); color: #5effa0; border: 1px solid rgba(52,199,89,0.3); }
+  .badge-not-oman { background: rgba(224,90,75,0.2); color: #ff8a7f; border: 1px solid rgba(224,90,75,0.3); }
+
+  #turtle-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .info-pill {
+    background: rgba(10,92,120,0.35);
+    border: 1px solid rgba(126,240,232,0.12);
+    border-radius: 12px;
+    padding: 12px 15px;
+  }
+  .info-pill-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(126,240,232,0.6);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .info-pill-value {
+    font-size: 14px;
+    color: var(--white);
+    font-weight: 400;
+  }
+
+  .info-full {
+    background: rgba(10,92,120,0.35);
+    border: 1px solid rgba(126,240,232,0.12);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  .fact-box {
+    background: rgba(232,184,75,0.1);
+    border: 1px solid rgba(232,184,75,0.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .fact-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .fact-text { font-size: 13.5px; color: rgba(255,255,255,0.85); line-height: 1.5; }
+
+  .oman-section {
+    background: rgba(52,199,89,0.08);
+    border: 1px solid rgba(52,199,89,0.2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .oman-section.absent {
+    background: rgba(224,90,75,0.08);
+    border-color: rgba(224,90,75,0.2);
+  }
+  .oman-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(126,240,232,0.6);
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  .oman-value { font-size: 13.5px; color: rgba(255,255,255,0.85); line-height: 1.5; }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .status-Endangered { background: #ff6b6b; }
+  .status-Critically { background: #ff3333; box-shadow: 0 0 6px rgba(255,51,51,0.6); }
+  .status-Vulnerable { background: #ffa94d; }
+</style>
+</head>
+<body>
+<div class="bubbles">
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+</div>
+
+<div class="card">
+  <div class="header">
+    <span class="turtle-icon">🐢</span>
+    <h1>Sea Turtle <span>Identifier</span></h1>
+    <p class="subtitle">Biology Research Project · Omani Marine Life</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid">
+    <div class="select-wrap">
+      <label class="select-label">Size</label>
+      <select id="size">
+        <option value="">Choose size...</option>
+        <option>Large</option>
+        <option>Medium</option>
+        <option>Small</option>
+      </select>
+      <span class="select-arrow">▾</span>
+    </div>
+
+    <div class="select-wrap">
+      <label class="select-label">Shell Type</label>
+      <select id="shellType">
+        <option value="">Choose shell...</option>
+        <option>Hard</option>
+        <option>Leathery</option>
+      </select>
+      <span class="select-arrow">▾</span>
+    </div>
+
+    <div class="select-wrap full">
+      <label class="select-label">Appearance / Color</label>
+      <select id="color">
+        <option value="">Choose appearance...</option>
+        <option value="Green/Brown">Green/Brown — Smooth oval shell</option>
+        <option value="Olive">Olive — Heart-shaped shell</option>
+        <option value="Reddish-Brown">Reddish-Brown — Large head</option>
+        <option value="Pointed">Pointed beak — Beautiful scales</option>
+        <option value="Grey">Grayish — Circular shell</option>
+        <option value="Flat">Flat shell — Upturned edges</option>
+      </select>
+      <span class="select-arrow">▾</span>
+    </div>
+
+    <div class="select-wrap full">
+      <label class="select-label">Primary Habitat</label>
+      <select id="habitat">
+        <option value="">Choose habitat...</option>
+        <option>Coral reefs</option>
+        <option>Open ocean</option>
+        <option>Coastal (Worldwide)</option>
+        <option>Gulf of Mexico / US</option>
+        <option>Australia only</option>
+      </select>
+      <span class="select-arrow">▾</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="identifyTurtle()">🔍 Identify Species</button>
+    <button class="btn btn-secondary" onclick="resetForm()">↺ Reset</button>
+  </div>
+
+  <div id="result">
+    <div class="divider"></div>
+    <div class="img-frame">
+      <img id="turtle-image" src="" alt="Sea Turtle">
+      <div class="img-overlay">
+        <div id="oman-badge" class="badge"></div>
+        <h2 id="turtle-name"></h2>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-pill">
+        <div class="info-pill-label">Lifespan</div>
+        <div class="info-pill-value" id="view-lifespan"></div>
+      </div>
+      <div class="info-pill">
+        <div class="info-pill-label">Conservation Status</div>
+        <div class="info-pill-value" id="view-status"></div>
+      </div>
+    </div>
+
+    <div class="info-full" style="margin-bottom:10px;">
+      <div class="info-pill-label">Appearance</div>
+      <div class="info-pill-value" id="view-appearance" style="line-height:1.5;"></div>
+    </div>
+
+    <div class="fact-box" style="margin-bottom:10px;">
+      <span class="fact-icon">💡</span>
+      <div class="fact-text" id="view-fact"></div>
+    </div>
+
+    <div id="oman-section" class="oman-section">
+      <span style="font-size:18px; flex-shrink:0;">📍</span>
+      <div>
+        <div class="oman-label">Presence in Oman</div>
+        <div class="oman-value" id="view-oman-info"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const turtles = {
+  "Green": {
+    name: "Green Sea Turtle",
+    appearance: "Smooth, oval shell with shades of green and brown; small head.",
+    lifespan: "60–80+ years",
+    status: "Endangered",
+    fact: "Named for the green color of their body fat, not their shell.",
+    oman: true,
+    omanInfo: "Very common! Ras al-Jinz is a world-famous nesting site.",
+    img: "green.jpg"
+  },
+  "Hawksbill": {
+    name: "Hawksbill Sea Turtle",
+    appearance: "Narrow, pointed beak; beautiful overlapping shell scales.",
+    lifespan: "50–60 years",
+    status: "Critically Endangered",
+    fact: "Their shells were historically used to make tortoiseshell products.",
+    oman: true,
+    omanInfo: "Nests on the Daymaniyat Islands and the shores of Musandam.",
+    img: "hawksbill.jpg"
+  },
+  "Loggerhead": {
+    name: "Loggerhead Sea Turtle",
+    appearance: "Large head with powerful jaws; reddish-brown shell.",
+    lifespan: "50–70 years",
+    status: "Vulnerable",
+    fact: "They can crush hard-shelled prey like crabs and clams.",
+    oman: true,
+    omanInfo: "Masirah Island hosts one of the largest nesting groups in the world.",
+    img: "loggerhead.jpg"
+  },
+  "Leatherback": {
+    name: "Leatherback Sea Turtle",
+    appearance: "Largest sea turtle; leathery shell instead of hard plates.",
+    lifespan: "45–60 years",
+    status: "Vulnerable",
+    fact: "Can dive deeper than 1,000 meters into the ocean.",
+    oman: true,
+    omanInfo: "Migrate through Omani waters to feed, but rarely nest on beaches.",
+    img: "leatherback.jpg"
+  },
+  "OliveRidley": {
+    name: "Olive Ridley Sea Turtle",
+    appearance: "Smaller size; olive-colored, heart-shaped shell.",
+    lifespan: "~50 years",
+    status: "Vulnerable",
+    fact: "Famous for mass nesting events called 'arribadas'.",
+    oman: true,
+    omanInfo: "Nests in small numbers, primarily on Masirah Island.",
+    img: "olive.jpg"
+  },
+  "KempsRidley": {
+    name: "Kemp's Ridley Sea Turtle",
+    appearance: "Smallest sea turtle; grayish, circular shell.",
+    lifespan: "30–50 years",
+    status: "Critically Endangered",
+    fact: "This is the rarest sea turtle species in the world.",
+    oman: false,
+    omanInfo: "Native to the Gulf of Mexico; not found in Oman.",
+    img: "kemps.jpg"
+  },
+  "Flatback": {
+    name: "Flatback Sea Turtle",
+    appearance: "Flat, smooth shell with upturned edges.",
+    lifespan: "~50 years",
+    status: "Vulnerable (local)",
+    fact: "The only species that does not have an oceanic phase.",
+    oman: false,
+    omanInfo: "Endemic to Australia; not found in the Middle East.",
+    img: "flatback.jpg"
+  }
+};
+
+function identifyTurtle() {
+  const shell = document.getElementById("shellType").value;
+  const color = document.getElementById("color").value;
+  const habitat = document.getElementById("habitat").value;
+
+  let key = null;
+  if (shell === "Leathery") key = "Leatherback";
+  else if (color === "Pointed") key = "Hawksbill";
+  else if (color === "Reddish-Brown") key = "Loggerhead";
+  else if (color === "Green/Brown") key = "Green";
+  else if (color === "Olive") key = "OliveRidley";
+  else if (color === "Grey") key = "KempsRidley";
+  else if (habitat === "Australia only" || color === "Flat") key = "Flatback";
+
+  if (!key) {
+    const selects = document.querySelectorAll('select');
+    selects.forEach(s => { s.style.borderColor = 'rgba(224,90,75,0.6)'; setTimeout(()=>s.style.borderColor='', 1200); });
+    return;
+  }
+
+  const t = turtles[key];
+  const result = document.getElementById("result");
+  result.style.display = "none";
+
+  document.getElementById("turtle-image").src = t.img;
+  document.getElementById("turtle-name").textContent = t.name;
+  document.getElementById("view-appearance").textContent = t.appearance;
+  document.getElementById("view-lifespan").textContent = t.lifespan;
+  document.getElementById("view-fact").textContent = t.fact;
+
+  const statusEl = document.getElementById("view-status");
+  const dotClass = t.status.includes("Critically") ? "status-Critically" : t.status.includes("Endangered") ? "status-Endangered" : "status-Vulnerable";
+  statusEl.innerHTML = `<span class="status-dot ${dotClass}"></span>${t.status}`;
+
+  const badge = document.getElementById("oman-badge");
+  badge.textContent = t.oman ? "📍 Found in Oman" : "❌ Not in Oman";
+  badge.className = t.oman ? "badge badge-oman" : "badge badge-not-oman";
+
+  const omanSection = document.getElementById("oman-section");
+  omanSection.className = t.oman ? "oman-section" : "oman-section absent";
+  document.getElementById("view-oman-info").textContent = t.omanInfo;
+
+  setTimeout(() => { result.style.display = "block"; }, 50);
+}
+
+function resetForm() {
+  document.querySelectorAll('select').forEach(s => s.value = "");
+  document.getElementById("result").style.display = "none";
+}
+</script>
+</body>
+</html>
